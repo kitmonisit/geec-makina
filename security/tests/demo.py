@@ -38,7 +38,7 @@ class Actor(object):
 
     def print_msg(self, plaintext, recipient_pk):
         box = self.create_box(recipient_pk)
-        nonce = nacl.utils.random(box.NONCE_SIZE)
+        nonce = nacl.utils.random(box.NONCE_SIZE)  # this nonce must be provided by the server
         ciphertext = box.encrypt(plaintext, nonce)
         signedtext = self.sign_msg(ciphertext)
         with open(self.get_msg(), 'w') as fd:
