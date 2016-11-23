@@ -5,7 +5,7 @@ from nacl.encoding import HexEncoder
 
 class Decryptor(object):
     def __init__(self):
-        with open('security/server_sk', 'r') as fd:
+        with open('security/keys/secret/server', 'r') as fd:
             self.sk = PrivateKey(fd.read(), HexEncoder)
 
     def create_box(self, fname_pk):
@@ -23,8 +23,9 @@ class Decryptor(object):
         raw = raw_msg.split('_')
         sender = raw[0]
         signedtext = raw[1]
-        sender_pk = 'security/{0:s}_pk'.format(sender)
-        sender_vk = 'security/{0:s}_vk'.format(sender)
+
+        sender_pk = 'security/keys/public/{0:s}'.format(sender)
+        sender_vk = 'security/keys/verify/{0:s}'.format(sender)
 
         box = self.create_box(sender_pk)
         ciphertext = self.verify_msg(signedtext, sender_vk)
