@@ -1,3 +1,4 @@
+import os
 import nacl.utils
 from nacl.public import PrivateKey, PublicKey, Box
 from nacl.signing import SigningKey, VerifyKey
@@ -7,16 +8,19 @@ class Actor(object):
     def __init__(self, actor_name):
         self.actor_name = actor_name
         try:
-            with open(self.namer('sk'), 'r') as fd:
+            with open(self.get_key('secret'), 'r') as fd:
                 self.sk = PrivateKey(fd.read(), HexEncoder)
-            with open(self.namer('ssk'), 'r') as fd:
+            with open(self.get_key('sign'), 'r') as fd:
                 self.ssk = SigningKey(fd.read(), HexEncoder)
         except IOError:
             print 'You need to generate encryption keys.\n'
             raise
 
-    def namer(self, suffix):
-        return '_'.join([self.actor_name, suffix])
+    def get_key(self, subdir):
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'keys', subdir, self.actor_name)
+
+    def get_msg(self):
+        return '{0:s}_msg'.format(self.actor_name)
 
     def create_box(self, fname_pk):
         with open(fname_pk, 'r') as fd:
@@ -37,7 +41,7 @@ class Actor(object):
         nonce = nacl.utils.random(box.NONCE_SIZE)
         ciphertext = box.encrypt(plaintext, nonce)
         signedtext = self.sign_msg(ciphertext)
-        with open(self.namer('msg'), 'w') as fd:
+        with open(self.get_msg(), 'w') as fd:
             fd.write(signedtext)
 
     def read_msg(self, fname_msg, sender_pk, sender_vk):
