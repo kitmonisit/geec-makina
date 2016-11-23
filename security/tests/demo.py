@@ -3,21 +3,6 @@ from nacl.public import PrivateKey, PublicKey, Box
 from nacl.signing import SigningKey, VerifyKey
 from nacl.encoding import HexEncoder
 
-def generate_keys(actor_name):
-    sk = PrivateKey.generate()
-    pk = sk.public_key
-    ssk = SigningKey(seed=bytes(sk)).generate()
-    vk = ssk.verify_key
-
-    with open('_'.join([actor_name, 'sk']), 'w') as fd:
-        fd.write(sk.encode(HexEncoder))
-    with open('_'.join([actor_name, 'pk']), 'w') as fd:
-        fd.write(pk.encode(HexEncoder))
-    with open('_'.join([actor_name, 'ssk']), 'w') as fd:
-        fd.write(ssk.encode(HexEncoder))
-    with open('_'.join([actor_name, 'vk']), 'w') as fd:
-        fd.write(vk.encode(HexEncoder))
-
 class Actor(object):
     def __init__(self, actor_name):
         self.actor_name = actor_name
@@ -65,30 +50,22 @@ class Actor(object):
         plaintext = box.decrypt(ciphertext)
         print plaintext
 
-def initialize():
-    generate_keys('node')
-    generate_keys('server')
-
-# DO NOT initialize() or you will lose the pre-generated keys!!!
-# initialize()
-
 node = Actor('node')
 server = Actor('server')
 
 node.print_msg(
         plaintext = 'hello from node',
-        recipient_pk = 'server_pk')
+        recipient_pk = '../keys/public/server')
 server.read_msg(
         fname_msg = 'node_msg',
-        sender_pk = 'node_pk',
-        sender_vk = 'node_vk')
+        sender_pk = '../keys/public/node',
+        sender_vk = '../keys/verify/node')
 
 server.print_msg(
         plaintext = 'hi from server',
-        recipient_pk = 'node_pk')
+        recipient_pk = '../keys/public/node')
 node.read_msg(
         fname_msg = 'server_msg',
-        sender_pk = 'server_pk',
-        sender_vk = 'server_vk')
-
+        sender_pk = '../keys/public/server',
+        sender_vk = '../keys/verify/server')
 
