@@ -1,5 +1,6 @@
 from flask import Flask, request, session
 import nacl.utils
+from nacl.public import Box
 from nacl.encoding import HexEncoder
 
 import config
