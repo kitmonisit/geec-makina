@@ -1,8 +1,10 @@
 from flask import Flask, request, session
-from security import Decryptor
 import nacl.utils
-from nacl.public import PrivateKey, PublicKey, Box
 from nacl.encoding import HexEncoder
+
+import config
+from security import Decryptor
+
 app = Flask(__name__)
 app.secret_key = 'secret'
 
@@ -42,5 +44,5 @@ def send_message():
     return msg
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=config.DEBUG)
 
