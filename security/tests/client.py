@@ -48,6 +48,7 @@ class Client(object):
         self.node = Node('node')
 
     def send_msg(self, msg, recipient):
+        # URL = 'https://vast-lake-95491.herokuapp.com'
         URL = 'http://127.0.0.1:5000'
         sess = requests.Session()
         r = sess.get('{0:s}/nonce'.format(URL))
