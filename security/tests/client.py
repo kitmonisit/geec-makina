@@ -50,12 +50,13 @@ class Client(object):
     def send_msg(self, msg, recipient):
         # URL = 'https://vast-lake-95491.herokuapp.com'
         URL = 'http://127.0.0.1:5000'
+        headers = {'Connection': 'close'}
         sess = requests.Session()
-        r = sess.get('{0:s}/nonce'.format(URL))
+        r = sess.get('{0:s}/nonce'.format(URL), headers=headers)
         nonce = r.text
         # nonce = HexEncoder.encode('a'*24)
         payload = self.node.send_msg(msg, nonce, recipient)
-        r = sess.post('{0:s}/send_message'.format(URL), data=payload)
+        r = sess.post('{0:s}/send_message'.format(URL), data=payload, headers=headers)
         return r
 
 client = Client()
