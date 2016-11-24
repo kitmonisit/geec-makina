@@ -1,4 +1,4 @@
-DEBUG = True
+DEBUG = False
 
 config_dev = {
     'MYSQL_USERNAME' : 'username',
