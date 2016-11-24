@@ -26,17 +26,20 @@ def secure():
 # Use session cookies to send the nonce
 # Be sure Raul can get the nodeMCU to handle cookies
 # This is necessary to be protected against replay attacks
-@app.route("/session")
-def qqq():
-    nonce = nacl.utils.random(Box.NONCE_SIZE)  # this nonce must be provided by the server
+@app.route("/nonce")
+def send_nonce():
+    nonce = nacl.utils.random(Box.NONCE_SIZE)
     session['nonce'] = HexEncoder.encode(nonce)
     return session['nonce']
 
-@app.route("/same_session")
-def zzz():
-    key = session.get('nonce', 'None')
-    session.clear()
-    return key
+@app.route("/send_message", methods=["POST"])
+def send_message():
+    raw = request.get_data()
+    d = Decryptor()
+    msg = d.read_msg_nonce(raw)
+    if msg:
+        session.clear()
+    return msg
 
 if __name__ == "__main__":
     app.run(debug=True)
