@@ -36,11 +36,16 @@ class Decryptor(object):
         sender_vk = 'security/keys/verify/{0:s}'.format(sender)
 
         box = self.create_box(sender_pk)
+
+        # Verify that the message actually came from the purported sender
         ciphertext = self.verify_msg(signedtext, sender_vk)
+
+        # Decrypt the message
         plaintext = box.decrypt(ciphertext)
         return plaintext
 
     def read_msg_nonce(self, raw_msg):
+        # The raw HTTP POST body has the sender's name prepended to it
         raw = raw_msg.split('_')
         sender = raw[0]
         signedtext = raw[1]
@@ -50,10 +55,16 @@ class Decryptor(object):
 
         box = self.create_box(sender_pk)
         try:
+            # Verify that the message actually came from the purported sender
             ciphertext = self.verify_msg(signedtext, sender_vk)
+
+            # Verify that this is not a replay attack
             self.verify_nonce(ciphertext)
+
+            # Decrypt the message
             plaintext = box.decrypt(ciphertext)
         except:
+            # Any errors within the try block above means that the message is malicious
             # Give the hacker the cold shoulder treatment
             return ''
         return plaintext

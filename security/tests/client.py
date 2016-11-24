@@ -28,9 +28,16 @@ class Node(object):
 
     def send_msg(self, msg, nonce, recipient):
         box = Box(self.sk, self.get_key(recipient, 'public'))
+
+        # Get nonce from server
         nonce = HexEncoder.decode(nonce)
+
+        # Encrypt the message using the private key and nonce
         ciphertext = box.encrypt(msg, nonce)
+
+        # Sign the message using the signing key then encode for HTTP transmission
         signedtext = self.ssk.sign(ciphertext, HexEncoder)
+
         s = '{0:s}_{1:s}'
         out = s.format(self.name, signedtext)
         return out
