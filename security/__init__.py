@@ -1,4 +1,6 @@
+import os
 from flask import session
+import config
 import nacl.utils
 from nacl.public import PrivateKey, PublicKey, Box
 from nacl.signing import SigningKey, VerifyKey
@@ -10,6 +12,7 @@ class Decryptor(object):
             self.sk = PrivateKey(fd.read(), HexEncoder)
 
     def create_box(self, fname_pk):
+        self.verify_sender(fname_pk)
         with open(fname_pk, 'r') as fd:
             pk = PublicKey(fd.read(), HexEncoder)
         return Box(self.sk, pk)
@@ -17,7 +20,7 @@ class Decryptor(object):
     def verify_msg(self, signedtext, fname_vk):
         with open(fname_vk, 'r') as fd:
             vk = VerifyKey(fd.read(), HexEncoder)
-            ciphertext = vk.verify(signedtext, encoder=HexEncoder)
+        ciphertext = vk.verify(signedtext, encoder=HexEncoder)
         return ciphertext
 
     def verify_nonce(self, ciphertext):
@@ -27,6 +30,12 @@ class Decryptor(object):
             return True
         raise Exception, 'invalid nonce'
 
+    def verify_sender(self, key_path):
+        fname = os.path.split(key_path)[-1]
+        if os.path.exists(key_path):
+            return True
+        raise IOError('{0:s} is not registered in the server'.format(fname))
+
     def read_msg(self, raw_msg):
         raw = raw_msg.split('_')
         sender = raw[0]
@@ -35,13 +44,21 @@ class Decryptor(object):
         sender_pk = 'security/keys/public/{0:s}'.format(sender)
         sender_vk = 'security/keys/verify/{0:s}'.format(sender)
 
-        box = self.create_box(sender_pk)
+        try:
+            box = self.create_box(sender_pk)
 
-        # Verify that the message actually came from the purported sender
-        ciphertext = self.verify_msg(signedtext, sender_vk)
+            # Verify that the message actually came from the purported sender
+            ciphertext = self.verify_msg(signedtext, sender_vk)
 
-        # Decrypt the message
-        plaintext = box.decrypt(ciphertext)
+            # Decrypt the message
+            plaintext = box.decrypt(ciphertext)
+        except Exception as err:
+            if config.DEBUG:
+                plaintext = err.__class__.__name__ + ' : ' + err.message
+            else:
+                # Any errors within the try block above means that the message is malicious
+                # Give the hacker the cold shoulder treatment
+                plaintext = ''
         return plaintext
 
     def read_msg_nonce(self, raw_msg):
@@ -53,8 +70,9 @@ class Decryptor(object):
         sender_pk = 'security/keys/public/{0:s}'.format(sender)
         sender_vk = 'security/keys/verify/{0:s}'.format(sender)
 
-        box = self.create_box(sender_pk)
         try:
+            box = self.create_box(sender_pk)
+
             # Verify that the message actually came from the purported sender
             ciphertext = self.verify_msg(signedtext, sender_vk)
 
@@ -63,9 +81,12 @@ class Decryptor(object):
 
             # Decrypt the message
             plaintext = box.decrypt(ciphertext)
-        except:
-            # Any errors within the try block above means that the message is malicious
-            # Give the hacker the cold shoulder treatment
-            return ''
+        except Exception as err:
+            if config.DEBUG:
+                plaintext = err.__class__.__name__ + ' : ' + err.message
+            else:
+                # Any errors within the try block above means that the message is malicious
+                # Give the hacker the cold shoulder treatment
+                plaintext = ''
         return plaintext
 
