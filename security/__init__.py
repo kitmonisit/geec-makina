@@ -1,14 +1,13 @@
 import os
+
 from flask import session
-import config
 import nacl.utils
 from nacl.public import PrivateKey, PublicKey, Box
 from nacl.signing import SigningKey, VerifyKey
 from nacl.encoding import HexEncoder
 
-def compose_path(key_type):
-    this = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(this, 'keys', key_type)
+import config
+import utils
 
 class Decryptor(object):
     def __init__(self):
@@ -21,7 +20,7 @@ class Decryptor(object):
                 'sign'  : SigningKey,
                 'verify': VerifyKey
                 }
-        fullpath = os.path.join(compose_path(key_type), name)
+        fullpath = utils.compose_path(key_type, name)
         with open(fullpath, 'r') as fd:
             key = funcs[key_type](fd.read(), HexEncoder)
         return key

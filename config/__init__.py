@@ -1,4 +1,7 @@
+import os
+
 DEBUG = True
+KEY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'security/keys')
 
 config_dev = {
     'MYSQL_USERNAME' : 'username',
