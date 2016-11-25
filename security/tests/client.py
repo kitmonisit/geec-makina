@@ -23,10 +23,11 @@ class Node(object):
                 'sign'  : SigningKey,
                 'verify': VerifyKey
                 }
-        with open(os.path.join(compose_path(key_type), name), 'r') as fd:
+        fullpath = os.path.join(compose_path(key_type), name)
+        with open(fullpath, 'r') as fd:
             return funcs[key_type](fd.read(), HexEncoder)
 
-    def send_msg(self, msg, nonce, recipient):
+    def compose_msg(self, msg, nonce, recipient):
         box = Box(self.sk, self.get_key(recipient, 'public'))
 
         # Get nonce from server
@@ -42,11 +43,6 @@ class Node(object):
         out = s.format(self.name, signedtext)
         return out
 
-
-class Client(object):
-    def __init__(self):
-        self.node = Node('node')
-
     def send_msg(self, msg, recipient):
         # URL = 'https://vast-lake-95491.herokuapp.com'
         URL = 'http://127.0.0.1:5000'
@@ -55,11 +51,11 @@ class Client(object):
         r = sess.get('{0:s}/nonce'.format(URL), headers=headers)
         nonce = r.text
         # nonce = HexEncoder.encode('a'*24)
-        payload = self.node.send_msg(msg, nonce, recipient)
+        payload = self.compose_msg(msg, nonce, recipient)
         r = sess.post('{0:s}/send_message'.format(URL), data=payload, headers=headers)
         return r
 
-client = Client()
-r = client.send_msg('hello world', 'server')
+node = Node('node04')
+r = node.send_msg('hello world', 'server')
 print r.text
 

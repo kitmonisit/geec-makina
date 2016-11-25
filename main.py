@@ -1,4 +1,4 @@
-from flask import Flask, request, session
+from flask import Flask, request, session, make_response
 import nacl.utils
 from nacl.public import Box
 from nacl.encoding import HexEncoder
@@ -33,7 +33,8 @@ def secure():
 def send_nonce():
     nonce = nacl.utils.random(Box.NONCE_SIZE)
     session['nonce'] = HexEncoder.encode(nonce)
-    return session['nonce']
+    out = make_response(session['nonce'])
+    return out
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
