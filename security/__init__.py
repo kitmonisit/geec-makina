@@ -6,21 +6,28 @@ from nacl.public import PrivateKey, PublicKey, Box
 from nacl.signing import SigningKey, VerifyKey
 from nacl.encoding import HexEncoder
 
+def compose_path(key_type):
+    this = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(this, 'keys', key_type)
+
 class Decryptor(object):
     def __init__(self):
-        with open('security/keys/secret/server', 'r') as fd:
-            self.sk = PrivateKey(fd.read(), HexEncoder)
+        self.sk = self.get_key('server', 'secret')
 
-    def create_box(self, fname_pk):
-        self.verify_sender(fname_pk)
-        with open(fname_pk, 'r') as fd:
-            pk = PublicKey(fd.read(), HexEncoder)
-        return Box(self.sk, pk)
+    def get_key(self, name, key_type):
+        funcs = {
+                'secret': PrivateKey,
+                'public': PublicKey,
+                'sign'  : SigningKey,
+                'verify': VerifyKey
+                }
+        fullpath = os.path.join(compose_path(key_type), name)
+        with open(fullpath, 'r') as fd:
+            key = funcs[key_type](fd.read(), HexEncoder)
+        return key
 
-    def verify_msg(self, signedtext, fname_vk):
-        with open(fname_vk, 'r') as fd:
-            vk = VerifyKey(fd.read(), HexEncoder)
-        ciphertext = vk.verify(signedtext, encoder=HexEncoder)
+    def verify_msg(self, signedtext, sender_vk):
+        ciphertext = sender_vk.verify(signedtext, encoder=HexEncoder)
         return ciphertext
 
     def verify_nonce(self, ciphertext):
@@ -30,22 +37,29 @@ class Decryptor(object):
             return True
         raise Exception, 'invalid nonce'
 
-    def verify_sender(self, key_path):
-        fname = os.path.split(key_path)[-1]
-        if os.path.exists(key_path):
+    def verify_sender(self, sender):
+        try:
+            self.get_key(sender, 'public')
             return True
-        raise IOError('{0:s} is not registered in the server'.format(fname))
+        except IOError as err:
+            err.message = '{0:s} is not registered in the server'.format(sender)
+            raise err
 
     def read_msg(self, raw_msg):
         raw = raw_msg.split('_')
         sender = raw[0]
         signedtext = raw[1]
 
-        sender_pk = 'security/keys/public/{0:s}'.format(sender)
-        sender_vk = 'security/keys/verify/{0:s}'.format(sender)
-
         try:
-            box = self.create_box(sender_pk)
+            # Verify if sender is registered
+            self.verify_sender(sender)
+
+            # Get keys
+            sender_pk = self.get_key(sender, 'public')
+            sender_vk = self.get_key(sender, 'verify')
+
+            # Create the decryptor box
+            box = Box(self.sk, sender_pk)
 
             # Verify that the message actually came from the purported sender
             ciphertext = self.verify_msg(signedtext, sender_vk)
@@ -54,7 +68,7 @@ class Decryptor(object):
             plaintext = box.decrypt(ciphertext)
         except Exception as err:
             if config.DEBUG:
-                plaintext = err.__class__.__name__ + ' : ' + err.message
+                plaintext = err.__class__.__name__ + ': ' + err.message
             else:
                 # Any errors within the try block above means that the message is malicious
                 # Give the hacker the cold shoulder treatment
@@ -67,11 +81,16 @@ class Decryptor(object):
         sender = raw[0]
         signedtext = raw[1]
 
-        sender_pk = 'security/keys/public/{0:s}'.format(sender)
-        sender_vk = 'security/keys/verify/{0:s}'.format(sender)
-
         try:
-            box = self.create_box(sender_pk)
+            # Verify if sender is registered
+            self.verify_sender(sender)
+
+            # Get keys
+            sender_pk = self.get_key(sender, 'public')
+            sender_vk = self.get_key(sender, 'verify')
+
+            # Create the decryptor box
+            box = Box(self.sk, sender_pk)
 
             # Verify that the message actually came from the purported sender
             ciphertext = self.verify_msg(signedtext, sender_vk)
@@ -83,7 +102,7 @@ class Decryptor(object):
             plaintext = box.decrypt(ciphertext)
         except Exception as err:
             if config.DEBUG:
-                plaintext = err.__class__.__name__ + ' : ' + err.message
+                plaintext = err.__class__.__name__ + ': ' + err.message
             else:
                 # Any errors within the try block above means that the message is malicious
                 # Give the hacker the cold shoulder treatment

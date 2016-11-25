@@ -25,33 +25,43 @@ class Node(object):
                 }
         fullpath = os.path.join(compose_path(key_type), name)
         with open(fullpath, 'r') as fd:
-            return funcs[key_type](fd.read(), HexEncoder)
+            key = funcs[key_type](fd.read(), HexEncoder)
+        return key
 
     def compose_msg(self, msg, nonce, recipient):
+        # Create the encryptor box
         box = Box(self.sk, self.get_key(recipient, 'public'))
 
-        # Get nonce from server
+        # Hex decode the nonce
         nonce = HexEncoder.decode(nonce)
 
         # Encrypt the message using the private key and nonce
-        ciphertext = box.encrypt(msg, nonce)
+        ciphertext = box.encrypt(bytes(msg), nonce)
 
-        # Sign the message using the signing key then encode for HTTP transmission
+        # Sign the message using the signing key then hex encode for HTTP transmission
         signedtext = self.ssk.sign(ciphertext, HexEncoder)
 
-        s = '{0:s}_{1:s}'
-        out = s.format(self.name, signedtext)
+        # Prepend the sender name
+        out = '{0:s}_{1:s}'.format(self.name, signedtext)
         return out
 
     def send_msg(self, msg, recipient):
         # URL = 'https://vast-lake-95491.herokuapp.com'
         URL = 'http://127.0.0.1:5000'
         headers = {'Connection': 'close'}
+
+        # Start the session
         sess = requests.Session()
+
+        # GET request for a nonce
         r = sess.get('{0:s}/nonce'.format(URL), headers=headers)
         nonce = r.text
         # nonce = HexEncoder.encode('a'*24)
+
+        # Compose the encrypted message
         payload = self.compose_msg(msg, nonce, recipient)
+
+        # POST the message
         r = sess.post('{0:s}/send_message'.format(URL), data=payload, headers=headers)
         return r
 
