@@ -1,4 +1,5 @@
 import os
+
 from nacl.public import PrivateKey
 from nacl.signing import SigningKey
 from nacl.encoding import HexEncoder

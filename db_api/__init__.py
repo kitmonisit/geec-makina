@@ -1,11 +1,11 @@
+from functools import wraps
+import mysql.connector as sql
 import config
 if config.DEBUG:
     from config import config_dev as config_vars
 else:
     from config import config_prod as config_vars
 
-import mysql.connector as sql
-from functools import wraps
 
 class Connection(object):
     def __enter__(self):
