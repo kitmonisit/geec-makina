@@ -18,6 +18,8 @@ To send a message to the cloud, do the following:
 1. Send the HTTP POST to `http://vast-lake-95491.herokuapp.com/send_message`.
 1. The response you should get is the `plaintext`.  Your message was accepted.  Hooray!
 
+There is a Python example for the above actions in [client.py](security/tests/client.py).
+
 A note on keys and sender name to prepend:
 
 - If you are `node03`, use the `private` and `sign` keys with filename `node03`.
