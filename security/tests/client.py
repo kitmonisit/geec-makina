@@ -7,10 +7,6 @@ from nacl.encoding import HexEncoder
 
 from .. import utils
 
-def compose_path(key_type):
-    this = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(this, '..', 'keys', key_type)
-
 class Node(object):
     def __init__(self, name):
         self.name = name
@@ -69,6 +65,6 @@ class Node(object):
         return r
 
 node = Node('node04')
-r = node.send_msg('hello world', 'server')
+r = node.send_msg('the quick brown fox jumps over the lazy dog', 'server')
 print r.text
 
