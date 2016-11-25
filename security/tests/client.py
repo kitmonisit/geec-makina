@@ -25,7 +25,8 @@ class Node(object):
                 }
         fullpath = os.path.join(compose_path(key_type), name)
         with open(fullpath, 'r') as fd:
-            return funcs[key_type](fd.read(), HexEncoder)
+            key = funcs[key_type](fd.read(), HexEncoder)
+        return key
 
     def compose_msg(self, msg, nonce, recipient):
         box = Box(self.sk, self.get_key(recipient, 'public'))
