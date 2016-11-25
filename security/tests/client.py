@@ -1,8 +1,11 @@
 import os
+
 import requests
 from nacl.public import PrivateKey, PublicKey, Box
 from nacl.signing import SigningKey, VerifyKey
 from nacl.encoding import HexEncoder
+
+from .. import utils
 
 def compose_path(key_type):
     this = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +26,7 @@ class Node(object):
                 'sign'  : SigningKey,
                 'verify': VerifyKey
                 }
-        fullpath = os.path.join(compose_path(key_type), name)
+        fullpath = utils.compose_path(key_type, name)
         with open(fullpath, 'r') as fd:
             key = funcs[key_type](fd.read(), HexEncoder)
         return key

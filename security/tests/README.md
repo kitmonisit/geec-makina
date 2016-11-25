@@ -4,6 +4,5 @@
 
 2. In a separate terminal
 
-    $ cd security/tests
-    $ python client.py
+    $ python -m security.tests.client
 
