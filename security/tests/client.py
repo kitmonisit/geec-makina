@@ -34,7 +34,7 @@ class Node(object):
         nonce = HexEncoder.decode(nonce)
 
         # Encrypt the message using the private key and nonce
-        ciphertext = box.encrypt(msg, nonce)
+        ciphertext = box.encrypt(bytes(msg), nonce)
 
         # Sign the message using the signing key then encode for HTTP transmission
         signedtext = self.ssk.sign(ciphertext, HexEncoder)
