@@ -45,8 +45,8 @@ class Node(object):
         return out
 
     def send_msg(self, msg, recipient):
-        # URL = 'https://vast-lake-95491.herokuapp.com'
-        URL = 'http://127.0.0.1:5000'
+        URL = 'https://vast-lake-95491.herokuapp.com'
+        # URL = 'http://127.0.0.1:5000'
         headers = {'Connection': 'close'}
 
         # Start the session
