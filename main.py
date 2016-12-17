@@ -39,7 +39,7 @@ def send_nonce():
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
-    raw = utils.read_chunked().split('\n')[:-1]
+    raw = list(enumerate(utils.read_chunked().split('\n')[:-1]))
     d = Decryptor()
     msg = utils.concatenate(map(d.read_msg_nonce, raw))
     if msg:
@@ -52,6 +52,8 @@ def stream():
     raw = utils.read_chunked()
     print raw
     return make_response(raw)
+
+import pprint
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
