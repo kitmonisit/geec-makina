@@ -9,7 +9,6 @@ from flask import request
 def compose_path(key_type, name):
     return os.path.join(config.KEY_PATH, key_type, name)
 
-
 def read_chunked():
     with closing(StringIO()) as fd:
         req = request._get_current_object()
@@ -19,4 +18,10 @@ def read_chunked():
             fd.write(chunk)
         raw = fd.getvalue()
     return raw
+
+def concatenate(msg_list):
+    with closing(StringIO()) as fd:
+        fd.write(''.join(msg_list))
+        out = fd.getvalue()
+    return out
 

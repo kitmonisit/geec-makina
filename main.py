@@ -39,11 +39,12 @@ def send_nonce():
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
-    raw = utils.read_chunked()
+    raw = utils.read_chunked().split('\n')[:-1]
     d = Decryptor()
-    msg = d.read_msg_nonce(raw)
+    msg = utils.concatenate(map(d.read_msg_nonce, raw))
     if msg:
         session.clear()
+    print msg
     return msg
 
 @app.route("/stream", methods=["POST"])
