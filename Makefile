@@ -4,3 +4,6 @@ dev:
 deploy:
 	git push heroku deploy:master
 
+test:
+	python -m security.tests.client
+

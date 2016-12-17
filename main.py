@@ -1,3 +1,6 @@
+from contextlib import closing
+from StringIO import StringIO
+
 from flask import Flask, request, session, make_response
 import nacl.utils
 from nacl.public import Box
@@ -44,6 +47,21 @@ def send_message():
     if msg:
         session.clear()
     return msg
+
+@app.route("/stream", methods=["POST"])
+def stream():
+    # raw = request.get_data()
+    with closing(StringIO()) as fd:
+        chunk_size = 512
+        stream = request._get_current_object()
+        while True:
+            chunk = stream.input_stream.read()
+            print chunk
+            if len(chunk) == 0: break
+            fd.write(chunk)
+        raw = fd.getvalue()
+    print raw
+    return make_response(raw)
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
