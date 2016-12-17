@@ -74,25 +74,30 @@ class Decryptor(object):
                 plaintext = ''
         return plaintext
 
-    def read_msg_nonce(self, raw_msg):
+    def read_msg_nonce(self, raw):
         # The raw HTTP POST body has the sender's name prepended to it
-        raw = raw_msg.split('_')
-        sender = raw[0]
-        signedtext = raw[1]
+        stream_msg = raw[0]
+        if stream_msg == 0:
+            raw_msg = raw[1].split('_')
+            sender = raw_msg[0]
+            signedtext = raw_msg[1]
+        else:
+            signedtext = raw[1]
 
         try:
-            # Verify if sender is registered
-            self.verify_sender(sender)
+            if stream_msg == 0:
+                # Verify if sender is registered
+                self.verify_sender(sender)
 
-            # Get keys
-            sender_pk = self.get_key(sender, 'public')
-            sender_vk = self.get_key(sender, 'verify')
+                # Get keys
+                self.sender_pk = self.get_key(sender, 'public')
+                self.sender_vk = self.get_key(sender, 'verify')
 
             # Create the decryptor box
-            box = Box(self.sk, sender_pk)
+            box = Box(self.sk, self.sender_pk)
 
             # Verify that the message actually came from the purported sender
-            ciphertext = self.verify_msg(signedtext, sender_vk)
+            ciphertext = self.verify_msg(signedtext, self.sender_vk)
 
             # Verify that this is not a replay attack
             self.verify_nonce(ciphertext)

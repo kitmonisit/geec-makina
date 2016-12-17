@@ -1,12 +1,10 @@
-from contextlib import closing
-from StringIO import StringIO
-
 from flask import Flask, request, session, make_response
 import nacl.utils
 from nacl.public import Box
 from nacl.encoding import HexEncoder
 
 import config
+import utils
 from security import Decryptor
 
 app = Flask(__name__)
@@ -41,27 +39,21 @@ def send_nonce():
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
-    raw = request.get_data()
+    raw = list(enumerate(utils.read_chunked().split('\n')[:-1]))
     d = Decryptor()
-    msg = d.read_msg_nonce(raw)
+    msg = utils.concatenate(map(d.read_msg_nonce, raw))
     if msg:
         session.clear()
+    print msg
     return msg
 
 @app.route("/stream", methods=["POST"])
 def stream():
-    # raw = request.get_data()
-    with closing(StringIO()) as fd:
-        chunk_size = 512
-        stream = request._get_current_object()
-        while True:
-            chunk = stream.input_stream.read()
-            print chunk
-            if len(chunk) == 0: break
-            fd.write(chunk)
-        raw = fd.getvalue()
+    raw = utils.read_chunked()
     print raw
     return make_response(raw)
+
+import pprint
 
 if __name__ == "__main__":
     app.run(debug=config.DEBUG)
