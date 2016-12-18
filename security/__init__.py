@@ -32,7 +32,7 @@ class Decryptor(object):
     def verify_nonce(self, ciphertext):
         # print HexEncoder.encode(ciphertext)[:48]
         # print session['nonce']
-        if HexEncoder.encode(ciphertext)[:48] == session['nonce']:
+        if ciphertext[:24] == session['nonce']:
             return True
         raise Exception, 'invalid nonce'
 
@@ -82,7 +82,7 @@ class Decryptor(object):
             sender = raw_msg[0]
             signedtext = raw_msg[1]
         else:
-            signedtext = raw[1]
+            ciphertext = raw[1]
 
         try:
             if stream_msg == 0:
@@ -96,9 +96,19 @@ class Decryptor(object):
             # Create the decryptor box
             box = Box(self.sk, self.sender_pk)
 
-            # Verify that the message actually came from the purported sender
-            ciphertext = self.verify_msg(signedtext, self.sender_vk)
+            if stream_msg == 0:
+                # Verify that the message actually came from the purported sender
+                ciphertext = self.verify_msg(signedtext, self.sender_vk)
+            else:
+                ciphertext = HexEncoder.encode(session['nonce']) + ciphertext
+                ciphertext = HexEncoder.decode(ciphertext)
 
+            # TODO Increment nonce
+            nonce = bytearray(session['nonce'])
+            print HexEncoder.encode(session['nonce'])
+            for n in nonce:
+                print '{0:02X}'.format(n),
+            print
             # Verify that this is not a replay attack
             self.verify_nonce(ciphertext)
 
