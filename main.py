@@ -32,8 +32,10 @@ def secure():
 # This is necessary to be protected against replay attacks
 @app.route("/nonce")
 def send_nonce():
-    nonce = nacl.utils.random(Box.NONCE_SIZE)
-    session['nonce'] = HexEncoder.encode(nonce)
+    # nonce = nacl.utils.random(Box.NONCE_SIZE)
+    # session['nonce'] = HexEncoder.encode(nonce)
+    session['nonce'] = nacl.utils.random(Box.NONCE_SIZE)
+    # session['nonce'] = HexEncoder.encode(nonce)
     out = make_response(session['nonce'])
     return out
 
