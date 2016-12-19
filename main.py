@@ -46,6 +46,7 @@ def send_message():
     msg = utils.concatenate(map(d.read_msg_nonce, raw))
     if msg:
         session.clear()
+    print msg
     return msg
 
 @app.route("/stream", methods=["POST"])

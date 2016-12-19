@@ -107,6 +107,8 @@ class Decryptor(object):
 
             # Decrypt the message
             plaintext = box.decrypt(ciphertext)
+            plaintext_len = int(plaintext[:2], 16) + 2
+            plaintext = plaintext[2:plaintext_len]
         except Exception as err:
             if config.DEBUG:
                 plaintext = err.__class__.__name__ + ': ' + err.message
