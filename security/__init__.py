@@ -99,18 +99,11 @@ class Decryptor(object):
             if stream_msg == 0:
                 # Verify that the message actually came from the purported sender
                 ciphertext = self.verify_msg(signedtext, self.sender_vk)
-            else:
-                ciphertext = HexEncoder.encode(session['nonce']) + ciphertext
-                ciphertext = HexEncoder.decode(ciphertext)
 
-            # TODO Increment nonce
-            nonce = bytearray(session['nonce'])
-            print HexEncoder.encode(session['nonce'])
-            for n in nonce:
-                print '{0:02X}'.format(n),
-            print
-            # Verify that this is not a replay attack
-            self.verify_nonce(ciphertext)
+                # Verify that this is not a replay attack
+                self.verify_nonce(ciphertext)
+            else:
+                ciphertext = HexEncoder.decode(ciphertext)
 
             # Decrypt the message
             plaintext = box.decrypt(ciphertext)
