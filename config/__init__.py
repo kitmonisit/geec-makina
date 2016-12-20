@@ -1,6 +1,6 @@
 import os
 
-DEBUG = False
+DEBUG = True
 KEY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'security/keys')
 
 config_dev = {
