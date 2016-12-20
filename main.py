@@ -22,11 +22,8 @@ def post():
 
 @app.route("/nonce")
 def send_nonce():
-    # nonce = nacl.utils.random(Box.NONCE_SIZE)
-    # session['nonce'] = HexEncoder.encode(nonce)
     session['nonce'] = nacl.utils.random(Box.NONCE_SIZE)
-    # session['nonce'] = HexEncoder.encode(nonce)
-    out = make_response(session['nonce'])
+    out = make_response(HexEncoder.encode(session['nonce']))
     return out
 
 @app.route("/send_message", methods=["POST"])
