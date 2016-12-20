@@ -20,16 +20,6 @@ def post():
     msg = request.form.get('msg', '')
     return "posted message to server: {0:s}".format(msg)
 
-@app.route("/secure", methods=["POST"])
-def secure():
-    raw = request.get_data()
-    d = Decryptor()
-    msg = d.read_msg(raw)
-    return "{0:s}".format(msg)
-
-# Use session cookies to send the nonce
-# Be sure Raul can get the nodeMCU to handle cookies
-# This is necessary to be protected against replay attacks
 @app.route("/nonce")
 def send_nonce():
     # nonce = nacl.utils.random(Box.NONCE_SIZE)
@@ -41,9 +31,9 @@ def send_nonce():
 
 @app.route("/send_message", methods=["POST"])
 def send_message():
-    raw = list(enumerate(utils.read_chunked().split('\n')[:-1]))
+    raw = utils.read_chunked()
     d = Decryptor()
-    msg = utils.concatenate(map(d.read_msg_nonce, raw))
+    msg = d.decrypt(raw)
     if msg:
         session.clear()
     print msg

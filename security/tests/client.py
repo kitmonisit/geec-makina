@@ -42,8 +42,6 @@ class Node(object):
         msg = msg[1].ljust(129)
         if num == 0:
             ciphertext = box.encrypt(bytes(msg_len + msg), nonce)
-        elif num == 1:
-            out = 'bleeh'
         else:
             nonce = nacl.utils.random(Box.NONCE_SIZE)
             ciphertext = box.encrypt(bytes(msg_len + msg), nonce, HexEncoder)
@@ -53,7 +51,6 @@ class Node(object):
         if num == 0:
             signedtext = self.ssk.sign(ciphertext, HexEncoder)
             out = '{0:s}_{1:s}\n'.format(self.name, signedtext)
-
         return out
 
     def compose_msg(self, msg_list, nonce, recipient):
@@ -85,6 +82,8 @@ class Node(object):
         return r
 
 node = Node('node04')
-r = node.send_msg('the quick brown fox jumps over the lazy dog'.split(), 'server')
+s = 'the quick brown fox jumps over the lazy dog'.split()
+s = ['{0:s} '.format(m) for m in s]
+r = node.send_msg(s, 'server')
 print r.text
 

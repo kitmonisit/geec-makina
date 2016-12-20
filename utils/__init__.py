@@ -17,7 +17,8 @@ def read_chunked():
             if len(chunk) == 0: break
             fd.write(chunk)
         raw = fd.getvalue()
-    return raw
+    out = list(enumerate(raw.split('\n')))[:-1]
+    return out
 
 def concatenate(msg_list):
     with closing(StringIO()) as fd:
