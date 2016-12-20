@@ -14,11 +14,11 @@ def read_chunked():
         req = request._get_current_object()
         while True:
             chunk = req.input_stream.read()
-            print chunk
             if len(chunk) == 0: break
             fd.write(chunk)
         raw = fd.getvalue()
-    return raw
+    out = list(enumerate(raw.split('\n')))[:-1]
+    return out
 
 def concatenate(msg_list):
     with closing(StringIO()) as fd:
