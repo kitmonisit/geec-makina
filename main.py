@@ -1,3 +1,4 @@
+import arrow
 from flask import Flask, request, session, make_response
 import nacl.utils
 from nacl.public import Box
@@ -22,6 +23,7 @@ def post():
 
 @app.route("/nonce")
 def send_nonce():
+    session['timestamp'] = arrow.utcnow().timestamp
     session['nonce'] = nacl.utils.random(Box.NONCE_SIZE)
     out = make_response(HexEncoder.encode(session['nonce']))
     return out
