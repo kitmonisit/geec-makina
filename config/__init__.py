@@ -19,3 +19,5 @@ config_prod = {
     'MYSQL_DB'       : 'makina',
     }
 
+DATABASE_URL = 'postgresql-reticulated-25045'
+
