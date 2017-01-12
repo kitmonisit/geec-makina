@@ -1,5 +1,6 @@
 from functools import wraps
-import mysql.connector as sql
+# import mysql.connector as sql
+import psycopg2 as sql
 import config
 if config.DEBUG:
     from config import config_dev as config_vars
@@ -46,4 +47,20 @@ def dbwrap(func):
                     conn.rollback()
                     raise
     return wrapper
+
+
+# Sample usage of dbwrap
+@dbwrap
+def update_history_db(self, df, **kwargs):
+    conn = kwargs.get('conn')
+    cur = kwargs.get('cur')
+    cmd = '''INSERT
+        INTO navps (date, {0:s})
+            VALUES (%s, %s)
+        ON DUPLICATE KEY UPDATE
+            date = VALUES (date),
+            {0:s} = VALUES ({0:s})
+        '''.format(self.fund_code)
+    cur.executemany(cmd, map(to_sql_string, df.iterrows()))
+    conn.commit()
 

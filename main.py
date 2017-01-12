@@ -6,6 +6,7 @@ from nacl.encoding import HexEncoder
 
 import config
 import utils
+from db_api import dbwrap
 from security import Decryptor
 
 app = Flask(__name__)
@@ -43,6 +44,19 @@ def stream():
     raw = utils.read_chunked()
     print raw
     return make_response(raw)
+
+@app.route("/show_db")
+@dbwrap
+def show_db(**kwargs):
+    conn = kwargs.get('conn')
+    cur = kwargs.get('cur')
+    cmd = '''SELECT *
+        FROM uptime
+        '''
+    cur.execute(cmd)
+    out = cur.fetchall()
+    print out
+    return str(out)
 
 import pprint
 
