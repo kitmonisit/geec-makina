@@ -80,7 +80,7 @@ class Decryptor(object):
 
     def decrypt(self, raw):
         try:
-            out = utils.concatenate(map(self.read_msg_nonce, raw))
+            out = map(self.read_msg_nonce, raw)
         except Exception as err:
             if config.DEBUG:
                 out = err.__class__.__name__ + ': ' + err.message

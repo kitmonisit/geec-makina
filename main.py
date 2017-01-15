@@ -6,6 +6,7 @@ from nacl.encoding import HexEncoder
 
 import config
 import utils
+import db_api
 from security import Decryptor
 
 app = Flask(__name__)
@@ -23,7 +24,7 @@ def post():
 
 @app.route("/nonce")
 def send_nonce():
-    session['timestamp'] = arrow.utcnow().timestamp
+    session['timestamp'] = arrow.utcnow().format(config.TIMESTAMP_FMT)
     session['nonce'] = nacl.utils.random(Box.NONCE_SIZE)
     out = make_response(HexEncoder.encode(session['nonce']))
     return out
@@ -33,6 +34,11 @@ def send_message():
     raw = utils.read_chunked()
     d = Decryptor()
     msg = d.decrypt(raw)
+    if isinstance(msg, basestring):
+        return msg
+    else:
+        db_api.update_db(msg)
+        msg = 'db success'
     if msg:
         session.clear()
     print msg
@@ -43,6 +49,19 @@ def stream():
     raw = utils.read_chunked()
     print raw
     return make_response(raw)
+
+@app.route("/show_db")
+@db_api.dbwrap
+def show_db(**kwargs):
+    conn = kwargs.get('conn')
+    cur = kwargs.get('cur')
+    cmd = '''SELECT *
+        FROM uptime
+        '''
+    cur.execute(cmd)
+    out = cur.fetchall()
+    print out
+    return str(out)
 
 import pprint
 

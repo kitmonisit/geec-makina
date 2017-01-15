@@ -4,6 +4,9 @@ dev:
 deploy:
 	git push heroku deploy:master
 
+db_init:
+	python -m db_api.db_init
+
 test:
 	python -m security.tests.client
 

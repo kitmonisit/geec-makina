@@ -1,8 +1,12 @@
+import json
+
+from flask import session
 from functools import wraps
-import mysql.connector as sql
+# import mysql.connector as sql
+import psycopg2 as sql
 import config
 if config.DEBUG:
-    from config import config_dev as config_vars
+    from config import config_prod as config_vars
 else:
     from config import config_prod as config_vars
 
@@ -46,4 +50,39 @@ def dbwrap(func):
                     conn.rollback()
                     raise
     return wrapper
+
+@dbwrap
+def update_db(object_list, **kwargs):
+    try:
+        conn = kwargs.get('conn')
+        cur = kwargs.get('cur')
+        cmd = '''INSERT
+            INTO uptime (timestamp, client, message)
+                VALUES '''
+        args = '(%s, %s, %s)'
+        args_str = []
+        for o in object_list:
+            o = json.loads(o)
+            args_str.append(cur.mogrify(args,
+                    (session['timestamp'],
+                     o['client'],
+                     'hello world')))
+        cur.execute(' '.join(cur.mogrify(cmd + ','.join(args_str)).split()))
+        conn.commit()
+    except: conn.rollback()
+
+# Sample usage of dbwrap
+@dbwrap
+def update_history_db(self, df, **kwargs):
+    conn = kwargs.get('conn')
+    cur = kwargs.get('cur')
+    cmd = '''INSERT
+        INTO navps (date, {0:s})
+            VALUES (%s, %s)
+        ON DUPLICATE KEY UPDATE
+            date = VALUES (date),
+            {0:s} = VALUES ({0:s})
+        '''.format(self.fund_code)
+    cur.executemany(cmd, map(to_sql_string, df.iterrows()))
+    conn.commit()
 
