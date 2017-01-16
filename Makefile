@@ -7,6 +7,9 @@ deploy:
 db_init:
 	python -m db_api.db_init
 
+db_peek:
+	python -m db_api.db_peek
+
 test:
 	python -m security.tests.client
 
