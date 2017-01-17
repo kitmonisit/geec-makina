@@ -53,23 +53,26 @@ def dbwrap(func):
 
 @dbwrap
 def update_db(object_list, **kwargs):
-    try:
-        conn = kwargs.get('conn')
-        cur = kwargs.get('cur')
-        cmd = '''INSERT
-            INTO uptime (timestamp, client, message)
-                VALUES '''
-        args = '(%s, %s, %s)'
-        args_str = []
-        for o in object_list:
-            o = json.loads(o)
-            args_str.append(cur.mogrify(args,
-                    (session['timestamp'],
-                     o['client'],
-                     'hello world')))
-        cur.execute(' '.join(cur.mogrify(cmd + ','.join(args_str)).split()))
+    conn = kwargs.get('conn')
+    cur = kwargs.get('cur')
+    cmd = '''INSERT
+        INTO %s (timestamp, client, message)
+            VALUES '''
+    args = '(%s, %s, %s)'
+    args_str = []
+
+    for o in map(json.loads, object_list):
+        cmd_str = cur.mogrify(
+                cmd,
+                (o['table'],)
+                )
+        args_str = cur.mogrify(
+                args,
+                (session['timestamp'], o['client'], o['response'])
+                )
+        out = cmd_str + args_str
+        cur.execute(' '.join(out.split()))
         conn.commit()
-    except: conn.rollback()
 
 # Sample usage of dbwrap
 @dbwrap
