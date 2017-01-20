@@ -62,7 +62,8 @@ def update_db(object_list, **kwargs):
     args_str = []
 
     for o in map(json.loads, object_list):
-        cmd_str = cmd.format(o['table'])
+        # cmd_str = cmd.format(o['table'])
+        cmd_str = cmd.format('uptime')
         args_str = cur.mogrify(
                 args,
                 (session['timestamp'], o['client'], o['response'])
