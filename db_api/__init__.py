@@ -2,11 +2,11 @@ import json
 
 from flask import session
 from functools import wraps
-# import mysql.connector as sql
-import psycopg2 as sql
+import mysql.connector as sql
+# import psycopg2 as sql
 import config
 if config.DEBUG:
-    from config import config_prod as config_vars
+    from config import config_dev as config_vars
 else:
     from config import config_prod as config_vars
 
