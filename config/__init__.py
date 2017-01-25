@@ -7,11 +7,11 @@ KEY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'secur
 TIMESTAMP_FMT = 'YYYY-MM-DD HH:mm:ss'
 
 config_dev = {
-    'MYSQL_USERNAME' : 'kit',
-    'MYSQL_PASSWORD' : '',
-    'MYSQL_HOST'     : 'localhost',
-    'MYSQL_PORT'     : 5432,
-    'MYSQL_DB'       : 'kit',
+    'MYSQL_USERNAME' : 'kmonisit',
+    'MYSQL_PASSWORD' : 'qwerty',
+    'MYSQL_HOST'     : 'kmonisit-lx01.adgtdesign.analog.com',
+    'MYSQL_PORT'     : 3306,
+    'MYSQL_DB'       : 'makina',
     }
 
 url = urlparse.urlparse(os.environ.get('DATABASE_URL', ''))
