@@ -2,25 +2,39 @@ import json
 
 from flask import session
 from functools import wraps
-import mysql.connector as sql
-# import psycopg2 as sql
 import config
-if config.DEBUG:
-    from config import config_dev as config_vars
-else:
-    from config import config_prod as config_vars
+if config.DEBUG == 'mssql':
+    import pyodbc as sql
+    from config import config_mssql as config_vars
+    import os
+    os.environ["ODBCSYSINI"] = "."
+elif config.DEBUG == 'postgresql':
+    import psycopg2 as sql
+    from config import config_postgresql as config_vars
+elif config.DEBUG == 'mysql':
+    import psycopg2 as sql
+    from config import config_mysql as config_vars
 
 
 class Connection(object):
     def __enter__(self):
-        config = {
-            'user'     : config_vars.get('MYSQL_USERNAME', ''),
-            'password' : config_vars.get('MYSQL_PASSWORD', ''),
-            'host'     : config_vars.get('MYSQL_HOST'    , ''),
-            'port'     : config_vars.get('MYSQL_PORT'    , ''),
-            'database' : config_vars.get('MYSQL_DB'      , ''),
-            }
-        self.conn = sql.connect(**config)
+        if config.DEBUG == 'mssql':
+            conn_fmt = """
+                DSN={DB_DSN:s};
+                UID={DB_USERNAME:s};
+                PWD={DB_PASSWORD:s};
+                """
+            conn_str = ''.join(conn_fmt.split()).format(**config_vars)
+            self.conn = sql.connect(conn_str)
+        else:
+            conn_config = {
+                'user'     : config_vars.get('DB_USERNAME', ''),
+                'password' : config_vars.get('DB_PASSWORD', ''),
+                'host'     : config_vars.get('DB_HOST'    , ''),
+                'port'     : config_vars.get('DB_PORT'    , ''),
+                'database' : config_vars.get('DB_DATABASE', ''),
+                }
+            self.conn = sql.connect(**conn_config)
         return self.conn
 
     def __exit__(self, exceptionType, exceptionValue, traceback):
