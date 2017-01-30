@@ -10,6 +10,9 @@ db_init:
 db_peek:
 	python -m db_api.db_peek
 
+web_test:
+	curl 'https://vast-lake-95491.herokuapp.com/nonce'
+
 test:
 	python -m security.tests.client
 
