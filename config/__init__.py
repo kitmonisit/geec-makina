@@ -2,7 +2,7 @@ import os
 import urlparse
 
 # DEBUG = {'postgresql' | 'mysql' | 'mssql'}
-DEBUG = 'mssql'
+DEBUG = 'postgresql'
 KEY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'security/keys')
 
 TIMESTAMP_FMT = 'YYYY-MM-DD HH:mm:ss'
