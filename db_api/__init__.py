@@ -7,7 +7,7 @@ if config.DEBUG == 'mssql':
     import pyodbc as sql
     from config import config_mssql as config_vars
     import os
-    os.environ["ODBCSYSINI"] = "."
+    os.environ["ODBCSYSINI"] = "./db_api"
 elif config.DEBUG == 'postgresql':
     import psycopg2 as sql
     from config import config_postgresql as config_vars
