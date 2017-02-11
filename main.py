@@ -10,6 +10,10 @@ import db_api
 from security import Decryptor
 
 import pandas as pd
+from jinja2 import Environment, FileSystemLoader
+env = Environment(
+        loader=FileSystemLoader('templates')
+        )
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -70,7 +74,9 @@ def show_db(**kwargs):
     cur.execute(cmd)
     data = cur.fetchall()
     df = pd.DataFrame(data, columns=['timestamp', 'client', 'message'])
-    out = df.to_html(classes='datagrid')
+    table = df.to_html(classes='datagrid')
+    template = env.get_template('demo.html')
+    out = template.render(table=table)
     return str(out)
 
 import pprint
