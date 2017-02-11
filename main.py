@@ -57,12 +57,12 @@ def stream():
 def show_db(**kwargs):
     conn = kwargs.get('conn')
     cur = kwargs.get('cur')
-    cmd = '''SELECT *
+    cmd = '''SELECT timestamp, client, message
         FROM uptime
         '''
-    # cur.execute(cmd)
-    # out = cur.fetchall()
-    df = pd.read_sql_table('uptime', conn)
+    cur.execute(cmd)
+    data = cur.fetchall()
+    df = pd.DataFrame(data, columns=['timestamp', 'client', 'message'])
     out = df.to_html()
     return str(out)
 
