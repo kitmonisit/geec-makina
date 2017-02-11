@@ -57,8 +57,15 @@ def stream():
 def show_db(**kwargs):
     conn = kwargs.get('conn')
     cur = kwargs.get('cur')
-    cmd = '''SELECT timestamp, client, message
-        FROM uptime
+    cmd = '''
+        WITH t AS (SELECT *
+                   FROM uptime
+                   ORDER BY timestamp DESC
+                   LIMIT 8
+                  )
+        SELECT timestamp, client, message
+        FROM t
+        ORDER BY timestamp ASC
         '''
     cur.execute(cmd)
     data = cur.fetchall()
