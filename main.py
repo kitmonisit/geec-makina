@@ -70,7 +70,7 @@ def show_db(**kwargs):
     cur.execute(cmd)
     data = cur.fetchall()
     df = pd.DataFrame(data, columns=['timestamp', 'client', 'message'])
-    out = df.to_html()
+    out = df.to_html(classes='datagrid')
     return str(out)
 
 import pprint
