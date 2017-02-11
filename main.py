@@ -9,6 +9,8 @@ import utils
 import db_api
 from security import Decryptor
 
+import pandas as pd
+
 app = Flask(__name__)
 app.secret_key = 'secret'
 
@@ -58,9 +60,10 @@ def show_db(**kwargs):
     cmd = '''SELECT *
         FROM uptime
         '''
-    cur.execute(cmd)
-    out = cur.fetchall()
-    print out
+    # cur.execute(cmd)
+    # out = cur.fetchall()
+    df = pd.read_sql_table('uptime', conn)
+    out = df.to_html()
     return str(out)
 
 import pprint
