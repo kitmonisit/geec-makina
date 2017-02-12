@@ -63,17 +63,17 @@ def show_db(**kwargs):
     cur = kwargs.get('cur')
     cmd = '''
         WITH t AS (SELECT *
-                   FROM uptime
+                   FROM demo
                    ORDER BY timestamp DESC
                    LIMIT 8
                   )
-        SELECT timestamp, client, message
+        SELECT timestamp, client, handler_id, temperature, humidity
         FROM t
         ORDER BY timestamp ASC
         '''
     cur.execute(cmd)
     data = cur.fetchall()
-    df = pd.DataFrame(data, columns=['timestamp', 'client', 'message'])
+    df = pd.DataFrame(data, columns=['timestamp', 'client', 'handler_id', 'temp', 'humidity'])
     table = df.to_html(classes='datagrid')
     template = env.get_template('demo.html')
     out = template.render(table=table)
