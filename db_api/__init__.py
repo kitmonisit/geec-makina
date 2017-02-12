@@ -70,17 +70,20 @@ def update_db(object_list, **kwargs):
     conn = kwargs.get('conn')
     cur = kwargs.get('cur')
     cmd = '''INSERT
-        INTO {0:s} (timestamp, client, message)
+        INTO {0:s} (timestamp, client, handler_id, temperature, humidity)
             VALUES '''
-    args = '(%s, %s, %s)'
+    args = '(%s, %s, %s, %s, %s)'
     args_str = []
 
     for o in map(json.loads, object_list):
-        # cmd_str = cmd.format(o['table'])
-        cmd_str = cmd.format('uptime')
+        cmd_str = cmd.format(o['table'])
         args_str = cur.mogrify(
                 args,
-                (session['timestamp'], o['client'], o['response'])
+                (session['timestamp'],
+                 o['client'],
+                 o['handler_id'],
+                 o['temperature'],
+                 o['humidity'])
                 )
         out = cmd_str + args_str
         cur.execute(' '.join(out.split()))
