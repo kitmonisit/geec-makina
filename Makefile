@@ -10,6 +10,15 @@ db_init:
 db_peek:
 	python -m db_api.db_peek
 
+db_mssql:
+	python -m db_api.db_mssql_test
+
+mssql_login:
+	@ODBCSYSINI=./db_api isql **** **** ****
+
+web_test:
+	curl 'https://vast-lake-95491.herokuapp.com/nonce'
+
 test:
 	python -m security.tests.client
 
