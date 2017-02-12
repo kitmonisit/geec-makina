@@ -8,18 +8,43 @@
                 font-size: 24px !important;
                 line-height: 150% !important;
             }
+
+            div#visible {
+                visibility: visible;
+            }
         </style>
         <script type="text/javascript">
-            setTimeout(
-                function() {
-                    window.location.reload(1);
-                },
-                1000
-            );
+            var xmlHttp = null;
+            function xhr_show_db() {
+                var theUrl = "http://vast-lake-95491.herokuapp.com/xhr_show_db";
+
+                xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = display_table;
+                xmlHttp.open("GET", theUrl, true); // true for asynchronous
+                xmlHttp.send(null);
+            }
+
+            function display_table() {
+                //console.log(xmlHttp.responseText);
+                var visible = document.getElementById("visible");
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                {
+                    visible.innerHTML = xmlHttp.responseText;
+                }
+            }
+
+            function start() {
+                window.setInterval(xhr_show_db, 1000);
+            }
+
+            window.onload = start;
+
         </script>
     </head>
     <body>
-        {{ table }}
+        <div id="visible">
+            {{ table }}
+        </div>
     </body>
 </html>
 

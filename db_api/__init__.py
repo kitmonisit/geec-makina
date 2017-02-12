@@ -76,6 +76,7 @@ def update_db(object_list, **kwargs):
     args_str = []
 
     for o in map(json.loads, object_list):
+        print o
         cmd_str = cmd.format(o['table'])
         args_str = cur.mogrify(
                 args,

@@ -79,6 +79,27 @@ def show_db(**kwargs):
     out = template.render(table=table)
     return str(out)
 
+@app.route("/xhr_show_db")
+@db_api.dbwrap
+def xhr_show_db(**kwargs):
+    conn = kwargs.get('conn')
+    cur = kwargs.get('cur')
+    cmd = '''
+        WITH t AS (SELECT *
+                   FROM demo
+                   ORDER BY timestamp DESC
+                   LIMIT 8
+                  )
+        SELECT timestamp, client, handler_id, temperature, humidity
+        FROM t
+        ORDER BY timestamp ASC
+        '''
+    cur.execute(cmd)
+    data = cur.fetchall()
+    df = pd.DataFrame(data, columns=['timestamp', 'client', 'handler_id', 'temp', 'humidity'])
+    out = df.to_html(classes='datagrid')
+    return out
+
 import pprint
 
 if __name__ == "__main__":
