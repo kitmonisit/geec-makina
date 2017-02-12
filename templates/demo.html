@@ -12,8 +12,34 @@
             div#visible {
                 visibility: visible;
             }
+
+            div.online {
+                height: 50px;
+                width: 50px;
+                background-color: green;
+                float: left;
+            }
+
+            div.offline {
+                height: 50px;
+                width: 50px;
+                background-color: darkred;
+                float: left;
+            }
+
+            div#status_text {
+                height: 50px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-top: 3px;
+                padding-left: 10px;
+                font-family: 'Roboto Mono', monospace;
+                font-size: 24pt;
+                float: left;
+            }
         </style>
         <script type="text/javascript">
+            var counter = 0;
             var xmlHttp = null;
             function xhr_show_db() {
                 var theUrl = "http://vast-lake-95491.herokuapp.com/xhr_show_db";
@@ -27,9 +53,29 @@
             function display_table() {
                 //console.log(xmlHttp.responseText);
                 var visible = document.getElementById("visible");
-                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                var status_color = document.getElementById("status_color");
+                var status_text = document.getElementById("status_text");
+                var old = visible.innerHTML;
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200 && is_online(old))
                 {
                     visible.innerHTML = xmlHttp.responseText;
+                    status_text.innerHTML = "online"
+                    status_color.className = "online";
+                    counter = 0;
+                } else {
+                    if (counter > 14) {
+                        status_text.innerHTML = "offline"
+                        status_color.className = "offline";
+                    }
+                    counter++;
+                }
+            }
+
+            function is_online(text) {
+                if (text == xmlHttp.responseText || !text) {
+                    return false;
+                } else {
+                    return true;
                 }
             }
 
@@ -42,9 +88,12 @@
         </script>
     </head>
     <body>
-        <div id="visible">
-            {{ table }}
+        <div id="status_color" class="offline">
         </div>
+        <div id="status_text">
+            offline
+        </div>
+        <div id="visible">{{ table }}</div>
     </body>
 </html>
 
