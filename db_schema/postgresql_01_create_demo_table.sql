@@ -7,7 +7,7 @@ CREATE TABLE demo (
     temperature double precision NOT NULL,
     humidity    double precision NOT NULL
 );
-INSERT INTO demo
-    (timestamp, client, handler_id, temperature, humidity)
-    VALUES ('2017-01-11 20:35:00', 'node04', 'HANDLER00001', 25.0, 80);
+-- INSERT INTO demo
+    -- (timestamp, client, handler_id, temperature, humidity)
+    -- VALUES ('2017-01-11 20:35:00', 'node04', 'HANDLER00001', 25.0, 80);
 
