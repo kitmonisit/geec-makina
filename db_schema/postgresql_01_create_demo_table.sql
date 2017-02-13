@@ -6,4 +6,4 @@ CREATE TABLE demo (
     handler_id  varchar(128)     NOT NULL,
     temperature double precision NOT NULL,
     humidity    double precision NOT NULL
-)
+);
