@@ -100,6 +100,13 @@ def xhr_show_db(**kwargs):
     out = df.to_html(classes='datagrid')
     return out
 
+@app.route('/init_demo')
+def init_demo():
+    from db_api.db_init_demo import db_init
+    db_init()
+    return 'demo database has been reset'
+
+
 import pprint
 
 if __name__ == "__main__":
