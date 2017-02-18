@@ -18,6 +18,12 @@ env = Environment(
 app = Flask(__name__)
 app.secret_key = 'secret'
 
+@app.route("/")
+def index():
+    template = env.get_template('index.html')
+    out = template.render()
+    return out
+
 @app.route("/echo")
 def echo():
     msg = request.args.get('msg', '')
