@@ -79,7 +79,7 @@ def show_db(**kwargs):
         '''
     cur.execute(cmd)
     data = cur.fetchall()
-    df = pd.DataFrame(data, columns=['timestamp', 'client', 'handler_id', 'temp', 'humidity'])
+    df = pd.DataFrame(data, columns=['timestamp', 'client', 'handler_status', 'temp', 'humidity'])
     table = df.to_html(classes='datagrid')
     template = env.get_template('demo.html')
     out = template.render(table=table)
@@ -102,7 +102,7 @@ def xhr_show_db(**kwargs):
         '''
     cur.execute(cmd)
     data = cur.fetchall()
-    df = pd.DataFrame(data, columns=['timestamp', 'client', 'handler_id', 'temp', 'humidity'])
+    df = pd.DataFrame(data, columns=['timestamp', 'client', 'handler_status', 'temp', 'humidity'])
     out = df.to_html(classes='datagrid')
     return out
 
