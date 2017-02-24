@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <title>CloudMakina Demo</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+        <style type="text/css">
+            .datagrid { border-collapse: collapse; text-align: left; width: 100%; } .datagrid {font: normal 12px/150% 'Roboto Mono', Courier New, Courier, monospace; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }.datagrid  td, .datagrid  th { padding: 3px 10px; }.datagrid  thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#FFFFFF; font-size: 15px; font-weight: bold; border-left: 1px solid #0070A8; } .datagrid  thead th:first-child { border: none; }.datagrid  tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }.datagrid  tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid  tbody td:first-child { border-left: none; }.datagrid  tbody tr:last-child td { border-bottom: none; }.datagrid  tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} .datagrid  tfoot td { padding: 0; font-size: 12px } .datagrid  tfoot td div{ padding: 2px; }.datagrid  tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }.datagrid  tfoot  li { display: inline; }.datagrid  tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }.datagrid  tfoot ul.active, .datagrid  tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+
+            .datagrid th,td {
+                font-size: 24px !important;
+                line-height: 150% !important;
+            }
+
+            div#visible {
+                visibility: visible;
+            }
+
+            div.online {
+                height: 50px;
+                width: 50px;
+                background-color: green;
+                float: left;
+            }
+
+            div.offline {
+                height: 50px;
+                width: 50px;
+                background-color: darkred;
+                float: left;
+            }
+
+            div#status_text {
+                height: 50px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-top: 3px;
+                padding-left: 10px;
+                font-family: 'Roboto Mono', monospace;
+                font-size: 24pt;
+                float: left;
+            }
+        </style>
+        <script type="text/javascript">
+            var counter = 0;
+            var xmlHttp = null;
+            function xhr_show_db() {
+                var theUrl = "http://www.cloudmakina.com/xhr_show_db";
+
+                xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = display_table;
+                xmlHttp.open("GET", theUrl, true); // true for asynchronous
+                xmlHttp.send(null);
+            }
+
+            function display_table() {
+                //console.log(xmlHttp.responseText);
+                var visible = document.getElementById("visible");
+                var status_color = document.getElementById("status_color");
+                var status_text = document.getElementById("status_text");
+                var old = visible.innerHTML;
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200 && is_online(old))
+                {
+                    visible.innerHTML = xmlHttp.responseText;
+                    status_text.innerHTML = "online"
+                    status_color.className = "online";
+                    counter = 0;
+                } else {
+                    if (counter > 59) {
+                        status_text.innerHTML = "offline"
+                        status_color.className = "offline";
+                    }
+                    counter++;
+                }
+            }
+
+            function is_online(text) {
+                if (text == xmlHttp.responseText || !text) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            function start() {
+                window.setInterval(xhr_show_db, 4000);
+            }
+
+            window.onload = start;
+
+        </script>
+    </head>
+    <body>
+        <div id="status_color" class="offline"></div>
+        <div id="status_text">offline</div>
+        <div style="float: right;"><img src="static/logo.png" alt="CloudMakina" style="float: right; width:25%; padding: 10px;"></div>
+        <div id="visible">{{ table }}</div>
+    </body>
+</html>
+
+<!-- vim:fdm=syntax
+-->
+

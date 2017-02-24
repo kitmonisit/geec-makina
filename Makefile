@@ -7,8 +7,14 @@ deploy:
 db_init:
 	python -m db_api.db_init
 
+db_init_demo:
+	python -m db_api.db_init_demo
+
 db_peek:
 	python -m db_api.db_peek
+
+db_peek_demo:
+	python -m db_api.db_peek_demo
 
 db_mssql:
 	python -m db_api.db_mssql_test
